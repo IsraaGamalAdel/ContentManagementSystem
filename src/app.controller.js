@@ -27,6 +27,19 @@ const bootstrap = (app, express) => {
 
     app.use('/uploads' , express.static(path.resolve('./src/uploads')));
 
+    // app.all(`*`, (req, res, next) => {
+    //     console.log(
+    //     `
+    //         User with ip: ${req.ip} send request with:
+    //         URL: ${req.url}
+    //         method: ${req.method}
+    //         body: ${JSON.stringify(req.body)}
+    //         Headers:${JSON.stringify(req.headers['en'])}
+    //     `
+    //     );
+    //     next();
+    // });
+
     app.get("/", (req, res, next) => {
         return res.status(200).json({ message: "Welcome in node.js project powered by express and ES6" })
     })
@@ -38,7 +51,6 @@ const bootstrap = (app, express) => {
     app.all("*", (req, res, next) => {
         return res.status(404).json({ message: "In-valid routing" })
     })
-
 
     //mongoose
     connectDB();

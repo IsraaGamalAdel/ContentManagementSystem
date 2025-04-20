@@ -98,6 +98,10 @@ const userSchema = new Schema({
     blockedUsers: [{type:Types.ObjectId , ref: "User"}],
     updatedBy: {type:Types.ObjectId , ref: "User"},
     friends : [{type:Types.ObjectId , ref: "User"}],
+
+    viewers: [{ userId: {type:Types.ObjectId , ref: "User"}, time: Date }],
+    // viewers: [{ userId: {type:Types.ObjectId , ref: "User"}, time: [Date] }],
+
 },{
     timestamps: true,
     toObject:{ virtuals: true},
