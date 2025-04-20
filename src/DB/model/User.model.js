@@ -1,6 +1,8 @@
-import  mongoose, { model, Schema } from "mongoose";
+import  mongoose, { model, Schema, Types } from "mongoose";
+import * as authMiddlewareTypes from './../../middleware/auth.middleware.js';
 import * as bcrypt from "bcrypt";
 import CryptoJS from "crypto-js";
+
 
 
 export const genderTypes = {
@@ -55,6 +57,7 @@ const userSchema = new Schema({
     },
     // OTP Forgot-Password
     forgotPasswordOTP: String,
+
     provider: {
         type: String,
         enum: Object.values(providerTypes),
@@ -65,15 +68,20 @@ const userSchema = new Schema({
         enum: Object.values(genderTypes),
         default: genderTypes.male
     },
+    
     DOB: Date,
     phone: String,
+
+    //roles
     role: {
         type: String,
         enum: Object.values(authMiddlewareTypes.roleTypes),
         default: "User",
     },
+
+    // Image
     profilePic: {secure_url: String , public_id: String},
-    coverPic: [{secure_url: String , public_id: String}],
+    images: [{secure_url: String , public_id: String}],
     
     deleted: {type: Boolean},
 
@@ -109,5 +117,9 @@ userSchema.virtual('userName').set(function(value) {
 
 
 
-const userModel = mongoose.models.User || model("User" , users);
-export default userModel;
+
+export const userModel = mongoose.models.User || model("User" , userSchema);
+
+
+
+export const socketConnection = new Map();

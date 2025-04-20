@@ -1,10 +1,11 @@
-import UserModel from "../../../DB/model/User.model.js";
+import { userModel } from "../../../DB/model/User.model.js";
+
 
 
 export const signup = async (req, res, next) => {
     try{
         const {userName , email , password} = req.body;
-        const checkUsers = await UserModel.findOne({email});
+        const checkUsers = await userModel.findOne({email});
         if(checkUsers){
             return res.status(400).json({message:"user already exist"})
         }
