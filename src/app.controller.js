@@ -4,6 +4,8 @@ import connectDB from './DB/connection.js';
 import { globalErrorHandling } from './utils/response/error.response.js';
 // controllers
 import authController from './modules/auth/auth.controller.js';
+import contentController from './modules/contentManagement/content.controller.js';
+import userController from './modules/user/user.controller.js';
 
 import cors from 'cors'; // upload Deployment 
 import helmet from 'helmet';
@@ -43,7 +45,11 @@ const bootstrap = (app, express) => {
     app.get("/", (req, res, next) => {
         return res.status(200).json({ message: "Welcome in node.js project powered by express and ES6" })
     })
+
+
     app.use(`${url}/auth`, authController);
+    app.use(`${url}/content` , contentController)
+    app.use(`${url}/user`, userController);
 
 
     app.use(globalErrorHandling);

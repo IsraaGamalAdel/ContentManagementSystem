@@ -39,8 +39,7 @@ const userSchema = new Schema({
         unique: [true ,`already exist email`],
     },
     confirmEmail: {
-        type: Boolean,
-        default:false,
+        type: Date,
     },
     //tempEmail
     tempEmail: String,

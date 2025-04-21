@@ -52,12 +52,7 @@ export const verifyEmailTemplate = ({code , email } = {}) =>{
                         <table border="0" width="100%" >
                             <tr>
                                 <td>
-                                    <h1>
-                                        <img width="100%" src="path_to_your_logo.png" alt="Academy Logo" class="logo">
-                                    </h1>
-                                </td>
-                                <td>
-                                    <h2 style="margin:10px; padding:10px; background-color: #9b4caf; color: #fff; text-decoration: none; border-radius: 5px;">${code}</h2>
+                                    <h1 style=" width: 100%; text-align: center;"> Send Code To Email</h1>
                                 </td>
                             </tr>
                         </table>
@@ -68,8 +63,17 @@ export const verifyEmailTemplate = ({code , email } = {}) =>{
                         <table border="0" width="100%">
                             <tr>
                                 <td style="padding: 20px 0;">
-                                    <h2 style="text-align: center;">Welcome to our academy</h2>
+                                    <h2 style="text-align: center;"> Welcome </h2>
                                     <p style="text-align: center;"> Please login to your account with your details</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <h2 style="width: 100px; text-align: center; margin:auto; padding:10px; background-color: #9b4caf; 
+                                            color: #fff; text-decoration: none; border-radius: 5px;"
+                                    >
+                                        ${code}
+                                    </h2>
                                 </td>
                             </tr>
                             <tr>
@@ -94,7 +98,6 @@ export const verifyEmailTemplate = ({code , email } = {}) =>{
     </html>
     `
 };
-
 
 export const sendEmail = async ({to=[] , cc=[] , bcc=[] , subject = "", text="" , html="" , attachments=[]}={}) => {
 
