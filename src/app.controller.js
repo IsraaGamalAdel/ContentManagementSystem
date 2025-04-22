@@ -10,7 +10,22 @@ import userController from './modules/user/user.controller.js';
 import cors from 'cors'; // upload Deployment 
 import helmet from 'helmet';
 import morgan from 'morgan';
+// graphql
+import { createHandler } from 'graphql-http/lib/use/express';
+import { schema } from './modules/modules.schema.js';
+import rateLimit from 'express-rate-limit';
 
+
+
+
+const limiter = rateLimit({
+    limit: 5,
+    windowMs: 3 * 60 * 1000,
+    message: {
+        error: "Rate limit exceeded"
+    },
+    skipFailedRequests: true
+});
 
 
 // API
@@ -27,26 +42,16 @@ const bootstrap = (app, express) => {
         origin: '*'
     }));
 
+    app.use(limiter);
+
     app.use('/uploads' , express.static(path.resolve('./src/uploads')));
 
-    // app.all(`*`, (req, res, next) => {
-    //     console.log(
-    //     `
-    //         User with ip: ${req.ip} send request with:
-    //         URL: ${req.url}
-    //         method: ${req.method}
-    //         body: ${JSON.stringify(req.body)}
-    //         Headers:${JSON.stringify(req.headers['en'])}
-    //     `
-    //     );
-    //     next();
-    // });
 
     app.get("/", (req, res, next) => {
         return res.status(200).json({ message: "Welcome in node.js project powered by express and ES6" })
     })
 
-
+    app.use('/graphql' , createHandler({schema}));
     app.use(`${url}/auth`, authController);
     app.use(`${url}/content` , contentController)
     app.use(`${url}/user`, userController);

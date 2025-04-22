@@ -1,5 +1,4 @@
 import  mongoose, { model, Schema, Types } from "mongoose";
-import * as authMiddlewareTypes from './../../middleware/auth.middleware.js';
 
 
 export const types = {
@@ -50,6 +49,8 @@ const contentSchema = new Schema({
         }
     },
 
+    likes : [{type: Types.ObjectId , ref: "User" }],
+
     tags: [{type: Types.ObjectId , ref: "User"}],
 
     images:[{secure_url: String , public_id: String}],
@@ -72,12 +73,12 @@ const contentSchema = new Schema({
 });
 
 
-// contentSchema.virtual('comments' , {
-//     localField: '_id',
-//     foreignField: 'postId',
-//     ref: 'Comment',
-//     justOne: true
-// })
+contentSchema.virtual('comments' , {
+    localField: '_id',
+    foreignField: 'contentId',
+    ref: 'Comment',
+    justOne: true
+})
 
 
 

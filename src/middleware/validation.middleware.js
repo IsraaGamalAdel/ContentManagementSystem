@@ -36,6 +36,7 @@ export const generalFields = {
     gender: joi.string().valid(...Object.values(genderTypes)),
     DOB: joi.date().less("now"),
     id: joi.string().custom(validationObjectId),
+    idContent: joi.string().min(1).max(50).custom(validationObjectId),
     messages: joi.string().pattern(new RegExp(/^[a-zA-Z\u0621-\u064Aء-ئ][^#&<>\"~;$^%{}?]{2,500000}$/)), // to Arabic and English
     code: joi.string().pattern(new RegExp(/^\d{6}$/)),
     fileObject,
