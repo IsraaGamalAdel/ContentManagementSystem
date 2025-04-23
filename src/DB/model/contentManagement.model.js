@@ -8,6 +8,12 @@ export const types = {
 };
 
 
+export const viewersStatus = {
+    Mobile: "Mobile",
+    Desktop: "Desktop"
+}
+
+
 const contentSchema = new Schema({
 
     title: {     
@@ -57,7 +63,16 @@ const contentSchema = new Schema({
 
     userId: {type: Types.ObjectId , ref: "User" , required: true},
 
-    views: {type: Number , default: 0},
+    viewers: [{
+        userId: { type: Types.ObjectId, ref: "User" },
+        time: Date,
+        deviceType: { type: String, enum: [viewersStatus.Mobile , viewersStatus.Desktop] },
+        sessionStart: Date,
+        sessionEnd: Date,
+        duration: Number // in seconds date
+    }],
+    
+    viewCount: { type: Number, default: 0 },
 
     deletedBy: {type: Types.ObjectId , ref: "User" },
     createdAt: {type: Date , default: Date.now},

@@ -11,7 +11,7 @@ import { Types } from 'mongoose';
 
 
 const populateList = [
-    {path: 'userId' , select: "userName email image" },
+    {path: 'userId' , select: "firstName lastName email image" },
     {
         path: 'comments' , 
         match: { commentId: {$exists: false} } ,
@@ -28,7 +28,14 @@ const populateList = [
             }
         ]
     },
-    {path: 'tags' , select: "firstName lastName email image"  }
+    {path: 'tags' , select: "firstName lastName email image"  },
+    { path: 'viewers',
+        populate: {
+            path: 'userId',
+            select: "firstName lastName email image"
+        }
+    },
+    {path: 'viewCount'}
 ];
 
 

@@ -2,6 +2,8 @@ import * as dbService from "../../../DB/db.service.js";
 import { contentModel } from "../../../DB/model/contentManagement.model.js";
 import { userModel } from "../../../DB/model/User.model.js";
 import { roleTypes } from "../../../middleware/auth.middleware.js";
+import { errorAsyncHandler } from "../../../utils/response/error.response.js";
+import { successResponse } from "../../../utils/response/success.response.js";
 import { decodeEncryption } from "../../../utils/security/encryption.security.js";
 
 
@@ -11,10 +13,6 @@ export const dashBoardAdmin = errorAsyncHandler(
     async (req , res , next) => {
 
         const data = await Promise.allSettled([
-            dbService.findAll({
-                model: userModel,
-                filter: {}
-            }),
             dbService.findAll({
                 model: contentModel,
                 filter: {}
@@ -29,7 +27,7 @@ export const dashBoardAdmin = errorAsyncHandler(
     }
 );
 
-
+// Admin Update role user
 export const changePrivileges = errorAsyncHandler(
     async (req, res, next) => {
         const { userId, role } = req.body;
