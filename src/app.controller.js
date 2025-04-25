@@ -6,6 +6,7 @@ import { globalErrorHandling } from './utils/response/error.response.js';
 import authController from './modules/auth/auth.controller.js';
 import contentController from './modules/contentManagement/content.controller.js';
 import userController from './modules/user/user.controller.js';
+import notificationController from './modules/notifications/notifications.controller.js';
 
 import cors from 'cors'; // upload Deployment 
 import helmet from 'helmet';

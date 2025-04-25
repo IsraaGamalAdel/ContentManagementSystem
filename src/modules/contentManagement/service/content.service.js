@@ -1,12 +1,16 @@
 import * as dbService from '../../../DB/db.service.js';
 import { errorAsyncHandler } from "../../../utils/response/error.response.js";
 import cloudinary from './../../../utils/multer/cloudinary.js';
-import { contentModel } from "../../../DB/model/contentManagement.model.js";
+import { contentModel } from '../../../DB/model/contentManagement.model.js';
 import { successResponse } from './../../../utils/response/success.response.js';
 import { roleTypes } from '../../../middleware/auth.middleware.js';
 import { pagination } from './../../../utils/security/pagination.security.js';
-import { userModel } from '../../../DB/model/User.model.js';
+import { socketConnection, userModel } from '../../../DB/model/User.model.js';
 import { Types } from 'mongoose';
+import { getIo } from '../../notifications/notifications.socket.controller.js';
+import { notificationsModel } from '../../../DB/model/Notifications.model.js';
+import {  sendEmail, sendNotificationsEmail } from '../../../utils/email/sendEmail.js';
+import { sendNotifications } from '../../notifications/service/sendNotifications.service.js';
 
 
 
@@ -39,8 +43,8 @@ const populateList = [
 ];
 
 
-
-export const createContentManagement = errorAsyncHandler(
+// create content2
+export const createContentManagement1 = errorAsyncHandler(
     async (req , res ,next) => {
         if(req.files){
 
@@ -127,6 +131,26 @@ export const createContentManagement = errorAsyncHandler(
             }
         })
 
+        if (contentManagement.tags && contentManagement.tags.length > 0) {
+            contentManagement.tags.forEach(tagId => {
+                const userSocketId = socketConnection.get(tagId.toString());
+                if (userSocketId) {
+                    getIo().to(userSocketId).emit("newContent", {
+                content: contentManagement,
+                message: "New content created!"
+                    });
+                }
+            });
+        }
+        
+        const creatorSocketId = socketConnection.get(req.user._id.toString());
+        if (creatorSocketId) {
+            getIo().to(creatorSocketId).emit("newContent", {
+                content: contentManagement,
+                message: "Your content was created successfully!"
+            });
+        }
+
         return successResponse({
             res,
             message: "Welcome User to your account ( Create contentManagement)",
@@ -135,8 +159,170 @@ export const createContentManagement = errorAsyncHandler(
         })
     }
 );
+// create content2
+export const createContentManagementSocket = errorAsyncHandler(
+    async (req, res, next) => {
+        if(req.files){
+
+            // if (req.body.type !== 'image') {
+            //     return next(new Error("Files can only be uploaded for image content", { cause: 400 }));
+            // }
+            
+            const images = [];
+            for (const file of req.files) {
+                const {secure_url , public_id} = await cloudinary.uploader.upload(file.path , { 
+                    folder: `${process.env.APP_NAME}/user/${req.user._id}/content`
+                })
+                images.push({secure_url , public_id});
+            }
+            req.body.images = images
+        }
+
+        const contentManagement = await dbService.create({
+            model: contentModel,
+            data: {
+                ...req.body,
+                userId: req.user._id,
+            }
+        });
+
+        if (contentManagement.tags && contentManagement.tags.length > 0) {
+            const notificationPromises = contentManagement.tags.map(async (tagId) => {
+                const notification = await dbService.create({
+                    model: notificationsModel,
+                    data: {
+                        type: 'tag',
+                        sender: req.user._id,
+                        receiver: tagId,
+                        content: contentManagement._id,
+                        metadata: {
+                            message: `${req.user.firstName} ${req.user.lastName} tagged you in a post`
+                        }
+                    }
+                });
+
+                await dbService.findOneAndUpdate({
+                    model: userModel,
+                    filter: { _id: tagId },
+                    data: {
+                        $push: { notifications: notification._id }
+                    }
+                })
+
+                const taggedUser = await dbService.findById({
+                    model: userModel,
+                    id: tagId
+                })
+                
+                if (taggedUser && taggedUser.email) {
+                    const emailContent = sendNotificationsEmail(`
+                        You've been tagged in a new post by ${req.user.firstName} ${req.user.lastName}.
+                        Check it out!
+                    `);
+                    
+                    await sendEmail({
+                        to: taggedUser.email,
+                        subject: "You've been tagged in a new content",
+                        html: emailContent
+                    });
+                }
+
+                const userSocketId = socketConnection.get(tagId.toString());
+                if (userSocketId) {
+                    getIo().to(userSocketId).emit("newNotification", {
+                        notification,
+                        message: "You have a new notification!"
+                    });
+                }
+
+                return notification;
+            });
+
+            await Promise.all(notificationPromises);
+        }
+
+        const creatorSocketId = socketConnection.get(req.user._id.toString());
+        if (creatorSocketId) {
+            getIo().to(creatorSocketId).emit("newNotification", {
+                content: contentManagement,
+                message: "Your content was created successfully!"
+            });
+        }
+
+        return successResponse({
+            res,
+            message: "Content created successfully",
+            status: 201,
+            data: { contentManagement }
+        });
+    }
+);
 
 
+// Create contentManagement
+export const createContentManagement = errorAsyncHandler(
+    async (req, res, next) => {
+        if(req.files){
+
+            // if (req.body.type !== 'image') {
+            //     return next(new Error("Files can only be uploaded for image content", { cause: 400 }));
+            // }
+            
+            const images = [];
+            for (const file of req.files) {
+                const {secure_url , public_id} = await cloudinary.uploader.upload(file.path , { 
+                    folder: `${process.env.APP_NAME}/user/${req.user._id}/content`
+                })
+                images.push({secure_url , public_id});
+            }
+            req.body.images = images
+        }
+
+        const contentManagement = await dbService.create({
+            model: contentModel,
+            data: {
+                ...req.body,
+                userId: req.user._id,
+            }
+        });
+
+        if (contentManagement.tags && contentManagement.tags.length > 0) {
+            const notificationPromises = contentManagement.tags.map(async (tagId) => {
+                await sendNotifications({
+                    type: "create",
+                    senderId: req.user._id,
+                    receiverId: tagId,
+                    contentId: contentManagement._id,
+                    firstName: req.user.firstName,
+                    lastName: req.user.lastName,
+                    contentData: {
+                        title: contentManagement.title,
+                        // description: contentManagement.description
+                    }
+                });
+            });
+
+            await Promise.all(notificationPromises);
+        }
+
+        const creatorSocketId = socketConnection.get(req.user._id.toString());
+        if (creatorSocketId) {
+            getIo().to(creatorSocketId).emit("newNotification", {
+                content: contentManagement,
+                message: "Your content was created successfully!"
+            });
+        }
+
+        return successResponse({
+            res,
+            message: "Content created successfully",
+            status: 201,
+            data: { contentManagement }
+        });
+    }
+);
+
+// Update contentManagement
 export const updateContentManagement = errorAsyncHandler(
     async (req , res , next) => {
 
@@ -239,6 +425,33 @@ export const updateContentManagement = errorAsyncHandler(
                 new: true
             }
         })
+
+
+        if (updatedContentManagement.tags && updatedContentManagement.tags.length > 0) {
+            const notificationPromises = updatedContentManagement.tags.map(async (tagId) => {
+                await sendNotifications({
+                    type: "Update Content",
+                    senderId: req.user._id,
+                    receiverId: tagId,
+                    contentId: updatedContentManagement._id,
+                    firstName: req.user.firstName,
+                    lastName: req.user.lastName,
+                    contentData: {
+                        title: updatedContentManagement.title,
+                    }
+                });
+            });
+
+            await Promise.all(notificationPromises);
+        }
+
+        const creatorSocketId = socketConnection.get(req.user._id.toString());
+        if (creatorSocketId) {
+            getIo().to(creatorSocketId).emit("newNotification", {
+                content: updatedContentManagement,
+                message: "Your content was updated successfully!"
+            });
+        }
 
         return successResponse({
             res,

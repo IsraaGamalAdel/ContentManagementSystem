@@ -30,13 +30,15 @@ router.patch("/:contentId" ,
 );
 
 
-router.delete('/delete/:contentId' , authentication() , authorization(endPoint.deleteContent) , 
+router.delete('/delete/:contentId' , 
+    authentication() , authorization(endPoint.deleteContent) , 
     validation(validators.deleteContentValidation) ,
     contentService.deleteContentManagement
 );
 
 
-router.patch('/restore/:contentId' , authentication() , authorization(endPoint.deleteContent) , 
+router.patch('/restore/:contentId' , 
+    authentication() , authorization(endPoint.deleteContent) , 
     validation(validators.deleteContentValidation) ,
     contentService.restoreContent
 );

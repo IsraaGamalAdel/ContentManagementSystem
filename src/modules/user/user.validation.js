@@ -39,3 +39,10 @@ export const replaceEmailValidation = joi.object().keys({
 export const shareProfileValidation = joi.object().keys({
     userId: generalFields.id.required(),
 }).required();
+
+
+
+export const adminPrivilegesValidation = joi.object().keys({
+    userId: generalFields.id.required(),
+    role: generalFields.role.required(),
+}).required();

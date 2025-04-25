@@ -15,15 +15,13 @@ const router = Router();
 
 router.get("/viewersContent/:contentId" ,
     validation(validators.viewersContentValidation) ,
-    authentication() ,
-    authorization(endPoint.users) ,
+    authentication() , authorization(endPoint.users) ,
     userService.viewersContent
 );
 
 router.get("/contentAnalytics/:contentId" ,
     validation(validators.viewersContentValidation) ,
-    authentication() ,
-    authorization(endPoint.users) ,
+    authentication() , authorization(endPoint.users) ,
     userService.contentAnalytics
 );
 
@@ -34,8 +32,9 @@ router.get('/profile/admin/dashboard',authentication() ,
 );
 
 
-router.post('/profile/admin/roles',authentication() , 
-    authorization(endPoint.admin),
+router.post('/profile/admin/roles',
+    validation(validators.adminPrivilegesValidation),
+    authentication() , authorization(endPoint.admin),
     adminService.changePrivileges
 );
 

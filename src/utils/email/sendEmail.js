@@ -124,7 +124,7 @@ export const sendEmail = async ({to=[] , cc=[] , bcc=[] , subject = "", text="" 
 
 
 //send code
-export const generateCodeTemplate = ( emailLink , code ) =>{
+export const sendNotificationsEmail = ( email ) =>{
     return ` <!DOCTYPE html>
     <html lang="ar">
         <head>
@@ -168,9 +168,7 @@ export const generateCodeTemplate = ( emailLink , code ) =>{
                         <table border="0" width="100%" >
                             <tr>
                                 <td>
-                                    <h1>
-                                        <img width="100%" src="path_to_your_logo.png" alt="Academy Logo" class="logo">
-                                    </h1>
+                                    <h1 style=" width: 100%; text-align: center;"> Send Code To Email</h1>
                                 </td>
                             </tr>
                         </table>
@@ -181,19 +179,19 @@ export const generateCodeTemplate = ( emailLink , code ) =>{
                         <table border="0" width="100%">
                             <tr>
                                 <td style="padding: 20px 0;">
-                                    <h2 style="text-align: center;">Welcome to our academy</h2>
+                                    <h2 style="text-align: center;"> Welcome </h2>
                                     <p style="text-align: center;"> Please login to your account with your details</p>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <form action="${emailLink}">
+                                    <form action="http://localhost:5173/login">
                                         <div style="text-align: center;">
-                                            <p>Code: <span class="credentials">${code}</span></p>
+                                            <p>Email: <span class="credentials">${email}</span></p>
                                         </div>
                                         
                                         <div style="text-align: center; margin-top: 20px;">
-                                            <input type="submit" value="Forget Password" class="submit-button"/>
+                                            <input type="submit" value="Go" class="submit-button"/>
                                         </div>
                                     </form>
                                 </td>

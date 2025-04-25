@@ -101,6 +101,13 @@ const userSchema = new Schema({
     viewers: [{ userId: {type:Types.ObjectId , ref: "User"}, time: Date }],
     // viewers: [{ userId: {type:Types.ObjectId , ref: "User"}, time: [Date] }],
 
+
+    // في userSchema:
+    notifications: [{
+        type: Types.ObjectId,
+        ref: 'Notification'
+    }]
+
 },{
     timestamps: true,
     toObject:{ virtuals: true},

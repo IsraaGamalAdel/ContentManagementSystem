@@ -6,21 +6,28 @@ dotenv.config({path:(path.resolve('./config/.env.dev'))});
 import  bootstrap  from './src/app.controller.js'
 import  express  from 'express'
 import deleteExpiredOTPs from './src/modules/auth/service/deletingExpiredOTP.service.js';
+import { runIo } from './src/modules/notifications/notifications.socket.controller.js';
+import chalk from 'chalk';
 
 
 const app = express()
-const PORT = process.env.PORT
+const port = process.env.PORT
 
 
 bootstrap(app , express);
 
 deleteExpiredOTPs();
 
-app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`));
+const httpServer = app.listen(port, () => {
+    console.log(chalk.bgBlue(`Example app listening on PORT ${port}!`))
+});
 
-app.on('error' , (err) => {
-    console.error(`server error ${err}`);
+// Socket.io
+runIo(httpServer);
+
+app.on('error', (err) => {
+    console.error(`Error app listening on PORT : ${err}`);
 });
 
 
-
+// dotenv.config({path:(path.resolve('./src/config/.env.prod'))});

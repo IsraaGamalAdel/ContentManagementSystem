@@ -13,8 +13,7 @@ import { endPoint } from "./comment.endpoint.js";
 const router = Router({mergeParams: true , caseSensitive: true , strict: false});
 
 router.post("/:commentId?" , 
-    authentication(),
-    authorization(endPoint.create),
+    authentication(), authorization(endPoint.create),
     uploadCloudinaryFile(fileValidationTypes.image).array('images' , 2),
     validation(validators.createCommentValidation),
     commentService.createComment
@@ -22,8 +21,7 @@ router.post("/:commentId?" ,
 
 
 router.patch("/:commentId" , 
-    authentication(),
-    authorization(endPoint.create),
+    authentication(), authorization(endPoint.create),
     uploadCloudinaryFile(fileValidationTypes.image).array('images' , 2),
     validation(validators.updateCommentValidation),
     commentService.updateComment
@@ -31,16 +29,14 @@ router.patch("/:commentId" ,
 
 
 router.delete("/:commentId/freeze" , 
-    authentication(),
-    authorization(endPoint.freeze),
+    authentication(), authorization(endPoint.freeze),
     validation(validators.freezeCommentValidation),
     commentService.freezeComment
 );
 
 
 router.patch("/:commentId/restore" , 
-    authentication(),
-    authorization(endPoint.freeze),
+    authentication(), authorization(endPoint.freeze),
     validation(validators.freezeCommentValidation),
     commentService.unFreezeComment
 );
