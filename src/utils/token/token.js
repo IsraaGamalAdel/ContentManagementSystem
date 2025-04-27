@@ -30,7 +30,7 @@ export const decodeToken = async ({authorization = "" , tokenType = tokenTypes.a
         default:
             break;
     }
-    const decoded = verifyToken2({ token , signature : tokenType === tokenTypes.access ? accessSignature : refreshSignature });
+    const decoded = verifyToken({ token , signature : tokenType === tokenTypes.access ? accessSignature : refreshSignature });
     if(!decoded?.id){
         return next(new Error("invalid token" , {cause: 401}));
     }
@@ -45,21 +45,29 @@ export const decodeToken = async ({authorization = "" , tokenType = tokenTypes.a
         return next(new Error("In_valid account user not found" , {cause: 404}));
     }
 
-    if(user.changeCredentialsTime?.getTime() >= decoded.iat * 1000){
-        return next(new Error("Expired Token Credentials access user not found" , {cause: 400}));
+    // if(user.changeCredentialsTime?.getTime() >= decoded.iat * 1000){
+    //     return next(new Error("Expired Token Credentials access user not found" , {cause: 400}));
+    // }
+    
+
+    const tolerance = 5000; 
+    if (
+        user.changeCredentialsTime?.getTime() >= decoded.iat * 1000 + tolerance
+    ) {
+        return next(new Error("Expired Token: Credentials have changed", { cause: 400 }));
     }
 
     return user;
 };
 
 
-export const generateToken2 = ({payload={} , signature = process.env.USER_ACCESS_TOKEN, expiresIn=parseInt(process.env.USER_EXPIREINTOKEN)} = {}) => {
+export const generateToken = ({payload={} , signature = process.env.USER_ACCESS_TOKEN, expiresIn=parseInt(process.env.USER_EXPIREINTOKEN)} = {}) => {
     const token = jwt.sign(payload , signature, {expiresIn} )
     return token;
 };
 
 
-export const verifyToken2 = ({token = "" , signature = process.env.USER_ACCESS_TOKEN} = {}) => {
+export const verifyToken = ({token = "" , signature = process.env.USER_ACCESS_TOKEN} = {}) => {
     const decoded = jwt.verify(token , signature)
     return decoded;
 };

@@ -1,6 +1,7 @@
 import joi from 'joi';
 import { genderTypes } from '../DB/model/User.model.js';
 import { Types } from 'mongoose';
+import { roleTypes } from './auth.middleware.js';
 
 
 
@@ -36,10 +37,12 @@ export const generalFields = {
     gender: joi.string().valid(...Object.values(genderTypes)),
     DOB: joi.date().less("now"),
     id: joi.string().custom(validationObjectId),
+    idContent: joi.string().min(1).max(50).custom(validationObjectId),
     messages: joi.string().pattern(new RegExp(/^[a-zA-Z\u0621-\u064Aء-ئ][^#&<>\"~;$^%{}?]{2,500000}$/)), // to Arabic and English
     code: joi.string().pattern(new RegExp(/^\d{6}$/)),
     fileObject,
-    files: joi.object(fileObject)
+    files: joi.object(fileObject),
+    role: joi.string().valid(...Object.values(roleTypes))
 }; 
 
 
@@ -52,7 +55,6 @@ export const validation = (scheme) => {
 
         if( req.file || req.files?.length){
             inputDate.file =  req.file || req.files ;
-            // inputDate.file = { ...req.file , ...req.files };
         }
         
         const validationError = scheme.validate( inputDate , {abortEarly: false});
