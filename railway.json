@@ -1,8 +1,15 @@
 {
     "build": {
       "builder": "NIXPACKS",
+      "nodeVersion": "20",
       "config": {
-        "aptPackages": ["libfontconfig1", "libgl1", "libxi6"]
+        "aptPackages": [
+          "libfontconfig1",
+          "libgl1-mesa-glx",
+          "libxi6",
+          "libcairo2-dev",
+          "libpango1.0-dev"
+        ]
       }
     }
   }
