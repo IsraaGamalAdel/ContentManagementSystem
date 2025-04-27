@@ -44,9 +44,9 @@ const populateList = [
 ];
 
 
-// create content2
-export const createContentManagement1 = errorAsyncHandler(
-    async (req , res ,next) => {
+// Create contentManagement
+export const createContentManagement = errorAsyncHandler(
+    async (req, res, next) => {
         if(req.files){
 
             // if (req.body.type !== 'image') {
@@ -64,12 +64,6 @@ export const createContentManagement1 = errorAsyncHandler(
         }
 
         if (req.body.tags) {
-
-            // const max = 20;
-            // if (req.body.tags.length > max) {
-            //     return next(new Error(`Maximum ${max} tags are allowed`, { cause: 400 }));
-            // }
-
             let tagsArray = [];
             if (typeof req.body.tags === 'string' && req.body.tags.startsWith('[')) {
                 try {
@@ -122,161 +116,6 @@ export const createContentManagement1 = errorAsyncHandler(
                 tags.push(user._id);
             }
             req.body.tags = tags;
-        }
-
-        const contentManagement = await dbService.create({
-            model: contentModel,
-            data: {
-                ...req.body,
-                userId: req.user._id,
-            }
-        })
-
-        if (contentManagement.tags && contentManagement.tags.length > 0) {
-            contentManagement.tags.forEach(tagId => {
-                const userSocketId = socketConnection.get(tagId.toString());
-                if (userSocketId) {
-                    getIo().to(userSocketId).emit("newContent", {
-                content: contentManagement,
-                message: "New content created!"
-                    });
-                }
-            });
-        }
-        
-        const creatorSocketId = socketConnection.get(req.user._id.toString());
-        if (creatorSocketId) {
-            getIo().to(creatorSocketId).emit("newContent", {
-                content: contentManagement,
-                message: "Your content was created successfully!"
-            });
-        }
-
-        return successResponse({
-            res,
-            message: "Welcome User to your account ( Create contentManagement)",
-            status: 201,
-            data: {contentManagement}
-        })
-    }
-);
-// create content2
-export const createContentManagementSocket = errorAsyncHandler(
-    async (req, res, next) => {
-        if(req.files){
-
-            // if (req.body.type !== 'image') {
-            //     return next(new Error("Files can only be uploaded for image content", { cause: 400 }));
-            // }
-            
-            const images = [];
-            for (const file of req.files) {
-                const {secure_url , public_id} = await cloudinary.uploader.upload(file.path , { 
-                    folder: `${process.env.APP_NAME}/user/${req.user._id}/content`
-                })
-                images.push({secure_url , public_id});
-            }
-            req.body.images = images
-        }
-
-        const contentManagement = await dbService.create({
-            model: contentModel,
-            data: {
-                ...req.body,
-                userId: req.user._id,
-            }
-        });
-
-        if (contentManagement.tags && contentManagement.tags.length > 0) {
-            const notificationPromises = contentManagement.tags.map(async (tagId) => {
-                const notification = await dbService.create({
-                    model: notificationsModel,
-                    data: {
-                        type: 'tag',
-                        sender: req.user._id,
-                        receiver: tagId,
-                        content: contentManagement._id,
-                        metadata: {
-                            message: `${req.user.firstName} ${req.user.lastName} tagged you in a post`
-                        }
-                    }
-                });
-
-                await dbService.findOneAndUpdate({
-                    model: userModel,
-                    filter: { _id: tagId },
-                    data: {
-                        $push: { notifications: notification._id }
-                    }
-                })
-
-                const taggedUser = await dbService.findById({
-                    model: userModel,
-                    id: tagId
-                })
-                
-                if (taggedUser && taggedUser.email) {
-                    const emailContent = sendNotificationsEmail(`
-                        You've been tagged in a new post by ${req.user.firstName} ${req.user.lastName}.
-                        Check it out!
-                    `);
-                    
-                    await sendEmail({
-                        to: taggedUser.email,
-                        subject: "You've been tagged in a new content",
-                        html: emailContent
-                    });
-                }
-
-                const userSocketId = socketConnection.get(tagId.toString());
-                if (userSocketId) {
-                    getIo().to(userSocketId).emit("newNotification", {
-                        notification,
-                        message: "You have a new notification!"
-                    });
-                }
-
-                return notification;
-            });
-
-            await Promise.all(notificationPromises);
-        }
-
-        const creatorSocketId = socketConnection.get(req.user._id.toString());
-        if (creatorSocketId) {
-            getIo().to(creatorSocketId).emit("newNotification", {
-                content: contentManagement,
-                message: "Your content was created successfully!"
-            });
-        }
-
-        return successResponse({
-            res,
-            message: "Content created successfully",
-            status: 201,
-            data: { contentManagement }
-        });
-    }
-);
-
-
-// Create contentManagement
-export const createContentManagement = errorAsyncHandler(
-    async (req, res, next) => {
-        if(req.files){
-
-            // if (req.body.type !== 'image') {
-            //     return next(new Error("Files can only be uploaded for image content", { cause: 400 }));
-            // }
-            
-            const images = [];
-            for (const file of req.files) {
-                const {secure_url , public_id} = await cloudinary.uploader.upload(file.path , { 
-                    folder: `${process.env.APP_NAME}/user/${req.user._id}/content`
-                })
-                images.push({secure_url , public_id});
-            }
-            req.body.images = images
         }
 
         const contentManagement = await dbService.create({

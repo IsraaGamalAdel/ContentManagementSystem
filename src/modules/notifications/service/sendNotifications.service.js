@@ -7,7 +7,6 @@ import { getIo } from "../notifications.socket.controller.js";
 
 
 
-
 export const sendNotifications = async ({
     type, // 'create' أو 'update'
     senderId, 
@@ -49,19 +48,6 @@ export const sendNotifications = async ({
             }
         }
     });
-    
-    
-    // if (contentId) {
-    //     await dbService.updateMany({
-    //         model: notificationsModel,
-    //         filter: {
-    //             content: contentId,
-    //             receiver: receiverId,
-    //             isRead: false
-    //         },
-    //         data: { isRead: true }
-    //     });
-    // }
 
 
     await dbService.findOneAndUpdate({
@@ -101,60 +87,4 @@ export const sendNotifications = async ({
     
     return notification;
 };
-
-
-
-export const sendNotifications1 = async ({
-    senderId, receiverId, contentId, firstName, lastName
-}) => {
-    const notification = await dbService.create({
-        model: notificationsModel,
-        data: {
-            type: 'tag',
-            sender: senderId,
-            receiver: receiverId,
-            content: contentId,
-            metadata: {
-                message: `${firstName} ${lastName} tagged you in a content`
-            }
-        }
-    });
-    
-    await dbService.findOneAndUpdate({
-        model: userModel,
-        filter: { _id: receiverId },
-        data: {
-            $push: { notifications: notification._id }
-        }
-    });
-    
-    const taggedUser = await dbService.findById({
-        model: userModel,
-        id: receiverId
-    });
-    
-    if (taggedUser && taggedUser.email) {
-        const emailContent = sendNotificationsEmail(`
-            You've been tagged in a new content by ${firstName} ${lastName}.
-            Check it out!
-        `);
-        
-        await sendEmail({
-            to: taggedUser.email,
-            subject: "You've been tagged in a new content",
-            html: emailContent
-        });
-    }
-    
-    const userSocketId = socketConnection.get(receiverId.toString());
-    if (userSocketId) {
-        getIo().to(userSocketId).emit("newNotification", {
-            notification,
-            message: "You have a new notification!"
-        });
-    }
-    
-    return notification;
-};
-
 

@@ -20,8 +20,8 @@ import rateLimit from 'express-rate-limit';
 
 
 const limiter = rateLimit({
-    limit: 5,
-    windowMs: 3 * 60 * 1000,
+    limit: 10,
+    windowMs: 10 * 60 * 1000,
     message: {
         error: "Rate limit exceeded"
     },
