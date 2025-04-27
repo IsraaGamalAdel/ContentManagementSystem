@@ -1,6 +1,6 @@
 import joi from 'joi';
 import { generalFields } from "../../middleware/validation.middleware.js";
-import { types } from '../../DB/model/contentManagement.model.js';
+import { types } from '../../DB/model/Content.model.js';
 
 
 
