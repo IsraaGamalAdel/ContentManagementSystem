@@ -3,7 +3,7 @@ import { successResponse } from './../../../utils/response/success.response.js';
 import * as dbService from '../../../DB/db.service.js';
 import cloudinary from './../../../utils/multer/cloudinary.js';
 import { roleTypes } from './../../../middleware/auth.middleware.js';
-import { contentModel } from "../../../DB/model/Content.model.js";
+import { contentModel } from "../../../DB/model/ContentManagement.model.js";
 import { commentModel } from './../../../DB/model/Comment.model.js';
 import { socketConnection, userModel } from './../../../DB/model/User.model.js';
 import { Types } from 'mongoose';

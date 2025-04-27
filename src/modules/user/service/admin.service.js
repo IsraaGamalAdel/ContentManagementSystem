@@ -1,5 +1,5 @@
 import * as dbService from "../../../DB/db.service.js";
-import { contentModel } from "../../../DB/model/Content.model.js";
+import { contentModel } from "../../../DB/model/ContentManagement.model.js";
 import { userModel } from "../../../DB/model/User.model.js";
 import { roleTypes } from "../../../middleware/auth.middleware.js";
 import { errorAsyncHandler } from "../../../utils/response/error.response.js";
