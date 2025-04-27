@@ -1,7 +1,7 @@
 import { GraphQLEnumType, GraphQLID, GraphQLInt, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
 // DB
 import * as dbService from "../../../DB/db.service.js";
-import { contentModel } from "../../../DB/model/Content.model.js";
+import { contentModel } from "../../../DB/model/ContentManagement.model.js";
 // utils
 import { authentication, authorization } from "../../../middleware/auth.graphQL.middleware.js";
 import { roleTypes } from "../../../middleware/auth.middleware.js";
