@@ -1,8 +1,10 @@
 
-// import path from 'path';
-// import * as dotenv from 'dotenv';
+import path from 'path';
+import * as dotenv from 'dotenv';
 
-// dotenv.config({path:(path.resolve('./config/.env.prod'))});
+// dotenv.config({path:(path.resolve('./config/.env.dev'))});
+
+dotenv.config({path:(path.resolve('./config/.env.prod'))});
 
 
 

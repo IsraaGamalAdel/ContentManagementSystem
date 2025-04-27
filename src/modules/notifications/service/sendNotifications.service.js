@@ -17,6 +17,7 @@ export const sendNotifications = async ({
     lastName,
     contentData 
 }) => {
+
     const notificationMessages = {
         create: {
             dbMessage: `${firstName} ${lastName} tagged you in a new content`,
@@ -49,6 +50,20 @@ export const sendNotifications = async ({
         }
     });
     
+    
+    // if (contentId) {
+    //     await dbService.updateMany({
+    //         model: notificationsModel,
+    //         filter: {
+    //             content: contentId,
+    //             receiver: receiverId,
+    //             isRead: false
+    //         },
+    //         data: { isRead: true }
+    //     });
+    // }
+
+
     await dbService.findOneAndUpdate({
         model: userModel,
         filter: { _id: receiverId },

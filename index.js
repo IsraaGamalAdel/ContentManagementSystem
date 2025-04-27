@@ -1,7 +1,9 @@
 import path from 'path';
 import * as dotenv from 'dotenv';
 
-dotenv.config({path:(path.resolve('./config/.env.dev'))});
+// dotenv.config({path:(path.resolve('./config/.env.dev'))});
+dotenv.config({path:(path.resolve('./config/.env.prod'))});
+
 
 import  bootstrap  from './src/app.controller.js'
 import  express  from 'express'
@@ -29,5 +31,3 @@ app.on('error', (err) => {
     console.error(`Error app listening on PORT : ${err}`);
 });
 
-
-// dotenv.config({path:(path.resolve('./src/config/.env.prod'))});

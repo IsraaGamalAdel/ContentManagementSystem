@@ -32,9 +32,17 @@ const notificationsSchema = new Schema({
         ref: 'Comment' 
     },
 
-    isRead: { 
-        type: Boolean, 
-        default: false 
+    // isRead: { 
+    //     type: Boolean, 
+    //     default: false 
+    // },
+
+    readBy: {
+        type: [{
+            user: { type: Types.ObjectId, ref: 'User' },
+            readAt: { type: Date, default: Date.now }
+        }],
+        default: []
     },
 
     metadata: {
@@ -45,8 +53,19 @@ const notificationsSchema = new Schema({
     deletedAt: Date
 }, {
     timestamps: true,
+    toObject:{ virtuals: true},
+    toJSON: {
+        virtuals: true
+    }
 });
 
+
+notificationsSchema.virtual('notifications' , {
+    localField: '_id',
+    foreignField: 'notificationId',
+    ref: 'Notification',
+    justOne: true
+})
 
 
 export const notificationsModel = mongoose.models.Notification || model("Notification" , notificationsSchema);

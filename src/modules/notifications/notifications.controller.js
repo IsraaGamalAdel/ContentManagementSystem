@@ -1,18 +1,18 @@
 import { Router } from 'express';
 import { authentication, authorization } from '../../middleware/auth.middleware.js';
-// import * as chatService from './service/notifications.service.js';
+import * as notificationService from './service/notifications.service.js';
+import * as validators from './notification.validation.js';
 import { validation } from "../../middleware/validation.middleware.js";
 import { endPoint } from './notifications.endpoint.js';
 
-// import * as validators from './user.validation.js';
 
 
 const router = Router();
 
-router.get('/:destId' , 
-    authentication(),
-    authorization(endPoint.profile),
-    // chatService.notification
+router.patch('/:notificationId/read' , 
+    validation(validators.notificationValidation) ,
+    authentication(), authorization(endPoint.profile),
+    notificationService.notificationAsRead
 );
 
 

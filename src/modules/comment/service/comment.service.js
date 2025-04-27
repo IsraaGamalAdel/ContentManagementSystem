@@ -3,10 +3,12 @@ import { successResponse } from './../../../utils/response/success.response.js';
 import * as dbService from '../../../DB/db.service.js';
 import cloudinary from './../../../utils/multer/cloudinary.js';
 import { roleTypes } from './../../../middleware/auth.middleware.js';
-import { contentModel } from "../../../DB/model/contentManagement.model.js";
+import { contentModel } from "../../../DB/model/ContentManagement.model.js";
 import { commentModel } from './../../../DB/model/Comment.model.js';
-import { userModel } from './../../../DB/model/User.model.js';
+import { socketConnection, userModel } from './../../../DB/model/User.model.js';
 import { Types } from 'mongoose';
+import { sendNotifications } from "../../notifications/service/sendNotifications.service.js";
+import { getIo } from "../../notifications/notifications.socket.controller.js";
 
 
 
@@ -117,7 +119,34 @@ export const createComment = errorAsyncHandler(
             }
         })
 
-        return successResponse({res ,message: 'deno' , status: 201 , data: {comment} });
+        if (comment.tags && comment.tags.length > 0) {
+            const notificationPromises = comment.tags.map(async (tagId) => {
+                await sendNotifications({
+                    type: "create comment",
+                    senderId: req.user._id,
+                    receiverId: tagId,
+                    contentId: comment._id,
+                    firstName: req.user.firstName,
+                    lastName: req.user.lastName,
+                    contentData: {
+                        title: comment.title,
+                        // description: comment.description
+                    }
+                });
+            });
+        
+            await Promise.all(notificationPromises);
+        }
+        
+        const creatorSocketId = socketConnection.get(req.user._id.toString());
+        if (creatorSocketId) {
+            getIo().to(creatorSocketId).emit("newNotification", {
+                content: comment,
+                message: "Your content was created successfully!"
+            });
+        }
+
+        return successResponse({res ,message: 'Comment created successfully' , status: 201 , data: {comment} });
         
     }
 );
@@ -233,8 +262,35 @@ export const updateComment = errorAsyncHandler(
         })
 
 
+        if (updateComment.tags && updateComment.tags.length > 0) {
+            const notificationPromises = updateComment.tags.map(async (tagId) => {
+                await sendNotifications({
+                    type: "create updateComment",
+                    senderId: req.user._id,
+                    receiverId: tagId,
+                    contentId: updateComment._id,
+                    firstName: req.user.firstName,
+                    lastName: req.user.lastName,
+                    contentData: {
+                        title: updateComment.title,
+                        // description: updateComment.description
+                    }
+                });
+            });
+        
+            await Promise.all(notificationPromises);
+        }
+        
+        const creatorSocketId = socketConnection.get(req.user._id.toString());
+        if (creatorSocketId) {
+            getIo().to(creatorSocketId).emit("newNotification", {
+                content: updateComment,
+                message: "Your content was created successfully!"
+            });
+        }
 
-        return successResponse({res ,message: 'Comment updated successfully' , status: 201 , data: {comment: updateComment} });
+
+        return successResponse({res ,message: 'updateComment updated successfully' , status: 201 , data: {comment: updateComment} });
         
     }
 );

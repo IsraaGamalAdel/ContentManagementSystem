@@ -56,6 +56,7 @@ const bootstrap = (app, express) => {
     app.use(`${url}/auth`, authController);
     app.use(`${url}/content` , contentController)
     app.use(`${url}/user`, userController);
+    app.use(`${url}/notification`, notificationController);
 
 
     app.use(globalErrorHandling);
