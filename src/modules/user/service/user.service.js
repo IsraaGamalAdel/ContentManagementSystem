@@ -8,6 +8,7 @@ import { compareHash, generateHash } from './../../../utils/security/hash.securi
 import { userModel } from "../../../DB/model/User.model.js";
 import { emailEvent } from './../../../utils/events/sendEmailEvent.js';
 import cloudinary from './../../../utils/multer/cloudinary.js';
+import { timeCodeOTP } from './../../../middleware/timeCode.middleware.js';
 
 
 
@@ -309,30 +310,6 @@ export const coverImages = errorAsyncHandler(
                 user
             }
         });
-    }
-);
-
-
-export const endViewSession = errorAsyncHandler(
-    async (req, res, next) => {
-        const { contentId } = req.params;
-        
-        await dbService.updateOne({
-            model: contentModel,
-            filter: { 
-                _id: contentId,
-                'viewers.userId': req.user._id,
-                'viewers.sessionEnd': { $exists: false }
-            },
-            data: {
-                $set: {
-                    'viewers.$.sessionEnd': Date.now(),
-                    'viewers.$.duration': Math.floor((Date.now() - sessionStart) / 1000)
-                }
-            }
-        });
-        
-        return successResponse({ res, message: "Session ended successfully" });
     }
 );
 

@@ -50,7 +50,6 @@ export const  VerifyConfirmEmail = errorAsyncHandler(
     async (req , res , next) => {
         const {email , code} = req.body;
 
-        // const user = await userModel.findOne({email});
         const user = await dbService.findOne({model: userModel ,filter: {email}});
 
         if(!user){
@@ -72,7 +71,6 @@ export const  VerifyConfirmEmail = errorAsyncHandler(
             filter: {email} , 
             data: { 
                 confirmEmail: Date.now() ,$unset: {emailOTP: 1 , otpExpiresAt: 1, otpBlockedUntil: 1 , otpAttempts: 1}  ,
-                // $set: { otpAttempts: 0} 
             }
         })
 

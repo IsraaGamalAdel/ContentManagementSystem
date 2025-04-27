@@ -7,39 +7,6 @@ import { getIo } from "../notifications.socket.controller.js";
 
 
 
-export const notificationAsRead1 = errorAsyncHandler(async (req, res, next) => {
-    const { notificationId } = req.params;
-    
-    const updatedNotification = await dbService.findOneAndUpdate({
-        model: notificationsModel,
-        filter: { 
-            _id: notificationId, 
-            receiver: req.user._id,
-        },
-        data: { $set: {readBy: { user: req.user._id }} ,},
-        options: { new: true }
-    });
-
-    if (!updatedNotification) {
-        return next(new Error("Notification not found or access denied", { cause: 404 }));
-    }
-
-    const userSocketId = socketConnection.get(req.user._id.toString());
-    if (userSocketId) {
-        getIo().to(userSocketId).emit("notificationRead", { 
-            notificationId,
-            readBy: updatedNotification.readBy
-        });
-    }
-
-    return successResponse({ 
-        res, 
-        message: "Notification marked as read",
-        data: { notification: updatedNotification }
-    });
-});
-
-
 
 export const notificationAsRead = errorAsyncHandler( async (req, res, next) => {
     const { notificationId } = req.params;
