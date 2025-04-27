@@ -64,7 +64,7 @@ Chart.register(
 // } catch (error) {
 //     console.error('Failed to generate charts:', error);
 //     return {}; // إرجاع كائن فارغ في حالة الخطأ
-// }
+//   }
 
 // };
 
