@@ -1,0 +1,8 @@
+{
+    "build": {
+      "builder": "NIXPACKS",
+      "config": {
+        "aptPackages": ["libfontconfig1", "libgl1", "libxi6"]
+      }
+    }
+  }
