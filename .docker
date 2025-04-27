@@ -1,0 +1,17 @@
+FROM node:20-bookworm
+
+WORKDIR /app
+
+# تثبيت الحزم النظامية المطلوبة
+RUN apt-get update && apt-get install -y \
+    libfontconfig1 \
+    libgl1 \
+    libxi6 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+CMD ["npm", "start"]
