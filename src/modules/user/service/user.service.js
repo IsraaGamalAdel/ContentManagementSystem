@@ -1,5 +1,5 @@
 import * as dbService from "../../../DB/db.service.js";
-import { contentModel } from "../../../DB/model/contentManagement.model.js";
+import { contentModel } from "../../../DB/model/Content.model.js";
 import { errorAsyncHandler } from "../../../utils/response/error.response.js";
 import { successResponse } from "../../../utils/response/success.response.js";
 import { decodeEncryption, generateEncryption } from "../../../utils/security/encryption.security.js";
