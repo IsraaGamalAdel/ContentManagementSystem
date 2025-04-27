@@ -1,7 +1,7 @@
 import { GraphQLEnumType, GraphQLID, GraphQLInt, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
 import * as dbService from "../../../DB/db.service.js";
 import * as contentTypes from "../types/content.types.js";
-import { contentModel } from "../../../DB/model/contentManagement.model.js";
+import { contentModel } from "../../../DB/model/Content.model.js";
 
 
 
