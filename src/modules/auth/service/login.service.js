@@ -41,7 +41,7 @@ export const signIn = errorAsyncHandler(
                 data: {
                     userName: payload.name,
                     email: payload.email,
-                    confirmEmail: payload.email_verified,
+                    confirmEmail: payload.email_verified ? Date.now() : null,
                     image: payload.picture,
                     provider: providerTypes.google
                 }
